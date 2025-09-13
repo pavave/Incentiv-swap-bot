@@ -1,27 +1,39 @@
 const fs = require("fs");
 const csv = require("csv-parser");
-const { tokens } = require("./tokens");
-const { ethers } = require("ethers");
+const { tokens, wallet } = require("./tokens");
 
-async function sendToken(tokenName, amount) {
-  const amountParsed = ethers.utils.parseUnits(amount.toString(), 18);
-  const balance = await tokens[tokenName].balanceOf(tokens[tokenName].signer.address);
+async function send(tokenName, amount) {
+  const token = tokens[tokenName];
+  const decimals = 18;
+  const amountToSend = BigInt(amount) * BigInt(10 ** decimals);
 
-  if (balance.lt(amountParsed)) {
-    console.log(`❌ Недостатньо балансу ${tokenName}. Є: ${ethers.utils.formatUnits(balance, 18)}`);
-    return;
-  }
+  const addresses = [];
 
   fs.createReadStream("addresses.csv")
     .pipe(csv())
-    .on("data", async (row) => {
-      if (fs.existsSync("stop.flag")) return console.log("🛑 Стоп-файл знайдено. Зупинка.");
-      const tx = await tokens[tokenName].transfer(row.address, amountParsed);
-      console.log(`📤 Sent ${tokenName} to ${row.address}: ${tx.hash}`);
+    .on("data", (row) => {
+      if (row.address) addresses.push(row.address.trim());
     })
-    .on("end", () => {
-      console.log("✅ Всі перекази завершено.");
+    .on("end", async () => {
+      console.log(`📤 Sending ${tokenName} to ${addresses.length} addresses`);
+
+      for (const address of addresses) {
+        if (fs.existsSync("stop.flag")) {
+          console.log("🛑 Stop flag detected. Halting.");
+          break;
+        }
+
+        try {
+          const tx = await token.transfer(address, amountToSend);
+          console.log(`✅ Sent to ${address}`);
+          await tx.wait();
+        } catch (err) {
+          console.log(`❌ Error sending to ${address}:`, err.message);
+        }
+      }
+
+      console.log("🎯 Done");
     });
 }
 
-module.exports = { sendToken };
+module.exports = { send };

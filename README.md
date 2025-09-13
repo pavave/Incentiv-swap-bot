@@ -39,6 +39,13 @@ npm install
 
 ```
 
+### Install required packages:
+
+```bash
+npm install ethers@6 dotenv csv-parser inquirer
+
+```
+
 ## 3. Configure Environment Variables
 Create and edit the .env file:
 

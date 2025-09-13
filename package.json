@@ -1,0 +1,15 @@
+{
+  "name": "incentiv-swap-bot",
+  "version": "1.0.0",
+  "description": "Token swap and distribution bot",
+  "main": "ui.js",
+  "scripts": {
+    "start": "node ui.js"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "dotenv": "^17.2.2",
+    "ethers": "^6.15.0",
+    "inquirer": "^9.2.7"
+  }
+}

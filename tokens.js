@@ -1,8 +1,8 @@
-const { ethers } = require("ethers");
+const { JsonRpcProvider, Wallet, Contract } = require("ethers");
 require("dotenv").config();
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const provider = new JsonRpcProvider(process.env.RPC_URL);
+const wallet = new Wallet(process.env.PRIVATE_KEY, provider);
 
 const erc20Abi = [
   "function balanceOf(address) view returns (uint)",
@@ -11,10 +11,10 @@ const erc20Abi = [
 ];
 
 const tokens = {
-  SMPL: new ethers.Contract(process.env.SMPL, erc20Abi, wallet),
-  FLIP: new ethers.Contract(process.env.FLIP, erc20Abi, wallet),
-  BULL: new ethers.Contract(process.env.BULL, erc20Abi, wallet),
-  WCENT: new ethers.Contract(process.env.WCENT, erc20Abi, wallet)
+  SMPL: new Contract(process.env.SMPL, erc20Abi, wallet),
+  FLIP: new Contract(process.env.FLIP, erc20Abi, wallet),
+  BULL: new Contract(process.env.BULL, erc20Abi, wallet),
+  WCENT: new Contract(process.env.WCENT, erc20Abi, wallet)
 };
 
 module.exports = { tokens, wallet, provider };
